@@ -114,8 +114,13 @@ class FlipBotV2:
             
             self.daily_trades += 1
             
-            progress = (current_return / self.daily_target) * 100
-            return f"🚀 FLIP WIN | +${profit:.2f} ({profit_pct:.1%}) | Capital: ${self.capital:.2f} | Progress: {progress:.0f}%"
+            # Recalculate progress after updating capital
+            new_return = (self.capital - self.initial_capital) / self.initial_capital
+            progress = (new_return / self.daily_target) * 100
+            return (
+                f"🚀 FLIP WIN | +${profit:.2f} ({profit_pct:.1%}) | "
+                f"Capital: ${self.capital:.2f} | Progress: {progress:.0f}%"
+            )
             
         else:
             # LOSS
@@ -129,8 +134,13 @@ class FlipBotV2:
             self.current_streak = 0
             self.daily_trades += 1
             
-            remaining = ((self.daily_target - current_return) * 100)
-            return f"❌ FLIP LOSS | -${loss:.2f} | Capital: ${self.capital:.2f} | Need: {remaining:.0f}%"
+            # Recalculate remaining progress after loss
+            new_return = (self.capital - self.initial_capital) / self.initial_capital
+            remaining = max(0, (self.daily_target - new_return) * 100)
+            return (
+                f"❌ FLIP LOSS | -${loss:.2f} | Capital: ${self.capital:.2f} "
+                f"| Need: {remaining:.0f}%"
+            )
     
     def get_status(self):
         current_dd = (self.initial_capital - self.capital) / self.initial_capital if self.initial_capital > 0 else 0
